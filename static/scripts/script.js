@@ -1,7 +1,6 @@
 let n = 0;
-var s = "";
+var s = [];
 let gift_id = "1";
-console.log(b);
 document.getElementById("create").addEventListener("click", () => {
     document.getElementById("pop_up").style.display = "block"
 })
@@ -27,7 +26,7 @@ function createBoard() {
         cell.addEventListener("click", function() {
             toggleShip(cell);
         });
-        s += "000"; 
+        s.push("000"); 
     }
 }
 
@@ -45,27 +44,20 @@ function toggleShip(cell) {
         }
     }
     let a = gift_id.length;
-    // if (a == 1){
-    //     s[currentIndex * 3] = "0";
-    //     s[currentIndex * 3 + 1] = "0";
-    //     s[currentIndex * 3 + 2] = gift_id[0];
-    // }
-    // else if (a == 2){
-    //     s[currentIndex * 3] = "0";
-    //     s[currentIndex * 3 + 1] = gift_id[0];
-    //     s[currentIndex * 3 + 2] = gift_id[1];
-    // }
-    // else if (a == 3){
-    //     s[currentIndex * 3] = gift_id[0];
-    //     s[currentIndex * 3 + 1] = gift_id[1];
-    //     s[currentIndex * 3 + 2] = gift_id[2];
-    // }
-    // else{
-    //     s[currentIndex * 3] = "0";
-    //     s[currentIndex * 3 + 1] = "0";
-    //     s[currentIndex * 3 + 2] = "0";
-    // }
-    s = s.replace
+    st = "";
+    if (a == 1){
+        st = "00" + gift_id[0];
+    }
+    else if (a == 2){
+        st = "0" + gift_id[0] + gift_id[1];
+    }
+    else if (a == 3){
+        st = gift_id
+    }
+    else{
+        st = "000";
+    }
+    s[currentIndex] = st;
     console.log(s);
 }
 
