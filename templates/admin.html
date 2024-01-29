@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link  type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{url_for('static', filename='scripts/script.js')}}" defer></script>
+</head>
+<body>
+    <div class="users">
+        <h2>пользователи</h2>
+    </div>
+    <div class="right">
+        <div class="up">
+            <h2>нажмите, чтобы cоздать поле</h2>
+            <button class="create" id="create">создать</button>
+        </div>
+        <div class="fields" id="fields">
+        </div>
+    </div>
+    <div class="settings" id="pop_up">
+        <label for="board-width">Введите ширину и высоту поля:</label>
+        <input type="number" id="board-width" min="" value="">
+        <button onclick="createBoard()">Создать поле</button>
+        <button id="add">сохранить</button>
+        <div id="board-container"></div>
+    </div>
+</body>
+</html>
+
