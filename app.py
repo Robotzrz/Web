@@ -17,7 +17,7 @@ people = mysql.connector.connect(
   password="14916",
   database="people"
 )
-
+# for i in range:
 people_cur = people.cursor()
 
 
