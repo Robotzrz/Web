@@ -18,6 +18,7 @@ people = mysql.connector.connect(
   database="people"
 )
 # for i in range:
+# fafafaa
 people_cur = people.cursor()
 
 
