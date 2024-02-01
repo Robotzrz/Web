@@ -59,6 +59,13 @@ function toggleShip(cell) {
     }
     s[currentIndex] = st;
     console.log(s);
+    let strok = "";
+    for (let i = 0; i < s.length; i++)
+    {
+        strok += s[i];
+    }
+    console.log(strok)
+    document.getElementById("code").value = strok;
 }
 
 function isAdjacentToShip(index, cells) {
