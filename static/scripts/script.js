@@ -39,7 +39,14 @@ function toggleShip(cell) {
     } else {
         // Проверка на близость кораблей
         if (!isAdjacentToShip(currentIndex, cells)) {
-            cell.classList.add("ship");
+            document.getElementById("pop_up2").style.display = "grid";
+            document.getElementById("accept").addEventListener("click", () => {
+                cell.classList.add("ship");
+                document.getElementById("pop_up2").style.display = "none"
+            })
+            document.getElementById("cancel").addEventListener("click", () => {
+                document.getElementById("pop_up2").style.display = "none"
+            })
         } else {
             alert("Нельзя ставить корабли близко друг к другу!");
         }
