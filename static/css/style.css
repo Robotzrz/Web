@@ -7,8 +7,6 @@ body{
 nav{
     align-items: end;
 }
-select{
-}
 .main{
     display: flex;
     flex-direction: row;
@@ -76,4 +74,11 @@ button{
     display: none;
     position: absolute;
     background-color: white;
+}
+.prizes{
+    position: absolute;
+    background-color: white;
+}
+select{
+    width: 100%
 }
