@@ -17,8 +17,6 @@ people = mysql.connector.connect(
   password="14916",
   database="people"
 )
-# for i in range:
-# fafafaa
 people_cur = people.cursor()
 
 
@@ -123,7 +121,7 @@ def add_gift(u_id, g_id):
 def add_field(u_id, f_id):
     people_cur.execute(f'SELECT fields FROM users WHERE id={u_id}')
     old_fields = str(people_cur.fetchall()[0])
-    new_fields = old_fields + get_string_one(g_id, 3)
+    new_fields = old_fields + get_string_one(f_id, 3)
     people_cur.execute(f'UPDATE fields FROM users WHERE id={u_id} TO {new_fields}')
 
     
