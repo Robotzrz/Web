@@ -35,7 +35,7 @@ def check_user(username, password):                                           # 
     if len(a) == 0:                                                           # 2 - имя и пароль верны
         return 0
     elif len(a) == 1:
-        if a[0] == password:
+        if a[0][0] == password:
             return 2
         else:
             return 1
@@ -50,7 +50,7 @@ def check_admin(username, password):                                           #
     if len(a) == 0:                                                            # 2 - имя и пароль верны
         return 0
     elif len(a) == 1:
-        if a[0] == password:
+        if a[0][0] == password:
             return 2
         else:
             return 1
@@ -67,7 +67,7 @@ def create_user(name, password):                   # функция возвра
         num = 0
         if a:
             num = a[-1][0] + 1
-        us = (num, name, password, {}, {})
+        us = (num, name, password, "", "")
         people_cur.execute(user_blank, us)
         people.commit()
         return 1
@@ -167,77 +167,64 @@ app = Flask(__name__)
 
 @app.route("/admin", methods=['GET', 'POST'])
 def admin():
-    # name = request.form.get("name")
+    name = request.form.get("name")
     board = str(request.form.get("code"))
-    # if current_name == "" or current_mode == "":
-    #     return redirect(url_for('reg'))
+    if current_name == "" or current_mode == "":
+        print("BACK TO LOGIN")
+        return redirect(url_for('login'))
     if board and len(board) > 2:
-        print(create_field("hi", board))
+        print(create_field(name, board))
     return render_template("admin.html")
 
 @app.route("/user", methods=['GET', 'POST'])
 def user():
     if current_name == "" or current_mode == "":
-        return redirect(url_for('reg'))
+        print("BACK TO LOGIN")
+        return redirect(url_for('login'))
     return render_template("user.html")
 
 @app.route("/reg", methods=['GET', 'POST'])
-
-def reg():
-    name = request.form.get('name')
-    password = request.form.get('password')
-    mode = request.form.get("admin")
-    print(name, password, mode)
-    if mode == "admin":
-        res = check_admin(name, password)
-        if res == 2:
-            current_name == name
-            current_mode == "admin"
-            return redirect(url_for('admin'))
-        return render_template("reg.html")
-    elif mode == "user":
-        res = check_user(name, password)
-        if res == 2:
-            current_name == name
-            current_mode == "user"
-            return redirect(url_for('user'))
-    return render_template("reg.html")
-
-def reg():
+def reg():                                    # Регистрация
+    global current_mode
+    global current_name
     name = request.form.get('name')
     password = request.form.get('password')
     mode = request.form.get("admin")
     print(name, password, mode)
     if mode == "admin":
         res = create_admin(name, password)
-        if res == 0:
-            current_name == name
-            current_mode == "admin"
+        if res == 1:
+            current_name = name
+            current_mode = "admin"
             return redirect(url_for('admin'))
     elif mode == "user":
         res = create_user(name, password)
-        if res == 0:
-            current_name == name
-            current_mode == "user"
+        if res == 1:
+            current_name = name
+            current_mode = "user"
             return redirect(url_for('user'))
     return render_template("reg.html")
 
-def login():
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():                                    # Вход
+    global current_mode
+    global current_name
     name = request.form.get('name')
     password = request.form.get('password')
     mode = request.form.get("admin")
-    print(name, password, mode)
+    print(str(name), str(password), str(mode))
     if mode == "admin":
         res = check_admin(name, password)
         if res == 2:
-            current_name == name
-            current_mode == "admin"
+            current_name = name
+            current_mode = "admin"
             return redirect(url_for('admin'))
     elif mode == "user":
         res = check_user(name, password)
         if res == 2:
-            current_name == name
-            current_mode == "user"
+            current_name = name
+            current_mode = "user"
             return redirect(url_for('user'))
     return render_template("login.html")
 

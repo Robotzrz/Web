@@ -2,40 +2,29 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>title</title>
+    <title>Регистрация</title>
     <link  type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/reg.css') }}">
 </head>
 <body>
   <div class="container">
     <div class="window">
       <h1>Добро пожаловать!</h1>
-      <form>
+      <form method="POST">
 
-      <div class="input_">
-        <p class="near">Логин</p>
-        <input type="login"/>
-      </div>
+        <label class="near">Логин</p><br>
+        <input type="login" name="name"/><br>
 
-      <div class="input_">
-        <p class="near">Пароль</p>
-        <input type="password"/>
-      </div>
+        <label class="near">Пароль</p><br>
+        <input type="password" name="password"/><br>
+    
+        <input type="radio" id="user" value="user" name="admin"/>
+        <label for="user">Пользователь</label><br>
+        <input type="radio" id="admin" value="admin" name="admin"/>
+        <label for="admin">Админ</label><br>
 
-      <div class="select">
-        <div>
-          <input type="radio" id="user" value="user" name="admin"/>
-          <label for="user">Пользователь</label>
-        </div>
+        <button id="enter" type="submit">Регистрация</button><br>
+        <a id="reg" href="/login">Войти</a>
 
-        <div>
-          <input type="radio" id="admin" value="admin" name="admin"/>
-          <label for="admin">Админ</label>
-        </div>
-      </div>
-      <div class="else">
-        <button id="enter" type="submit">Регистрация</button>
-        <a id="reg" link="/login">Войти</a>
-      </div>
       </form>
     </div>
   </div>

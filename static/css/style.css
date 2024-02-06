@@ -7,8 +7,8 @@ body{
 nav{
     align-items: end;
 }
-select{
-}
+/* select{
+} */
 .main{
     display: flex;
     flex-direction: row;
