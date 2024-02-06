@@ -163,7 +163,6 @@ def get_string_all(list1, length=3):
 current_name = ""
 current_mode = ""
 
-
 app = Flask(__name__)
 
 @app.route("/admin", methods=['GET', 'POST'])
@@ -183,6 +182,7 @@ def user():
     return render_template("user.html")
 
 @app.route("/reg", methods=['GET', 'POST'])
+
 def reg():
     name = request.form.get('name')
     password = request.form.get('password')
@@ -203,7 +203,43 @@ def reg():
             return redirect(url_for('user'))
     return render_template("reg.html")
 
+def reg():
+    name = request.form.get('name')
+    password = request.form.get('password')
+    mode = request.form.get("admin")
+    print(name, password, mode)
+    if mode == "admin":
+        res = create_admin(name, password)
+        if res == 0:
+            current_name == name
+            current_mode == "admin"
+            return redirect(url_for('admin'))
+    elif mode == "user":
+        res = create_user(name, password)
+        if res == 0:
+            current_name == name
+            current_mode == "user"
+            return redirect(url_for('user'))
+    return render_template("reg.html")
 
+def login():
+    name = request.form.get('name')
+    password = request.form.get('password')
+    mode = request.form.get("admin")
+    print(name, password, mode)
+    if mode == "admin":
+        res = check_admin(name, password)
+        if res == 2:
+            current_name == name
+            current_mode == "admin"
+            return redirect(url_for('admin'))
+    elif mode == "user":
+        res = check_user(name, password)
+        if res == 2:
+            current_name == name
+            current_mode == "user"
+            return redirect(url_for('user'))
+    return render_template("login.html")
 
 if __name__ == "__main__":
   app.run(debug=True, host="0.0.0.0", port=80)
