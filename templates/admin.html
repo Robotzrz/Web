@@ -8,6 +8,7 @@
     <script src="{{url_for('static', filename='scripts/script.js')}}" defer></script>
 </head>
 <body>
+   
     <div class="users">
         <h2>пользователи</h2>
     </div>
@@ -23,12 +24,12 @@
         <label for="board-width">Введите ширину и высоту поля:</label>
         <input type="number" id="board-width" min="" value="">
         <button onclick="createBoard()">Создать поле</button>
-        <button id="add">сохранить</button>
+        <form>
+            <input type="text" id="code" name="code">
+            <button id="add" type="submit">сохранить</button>
+        </form>
         <div id="board-container"></div>
     </div>
-<form>
-    <input type="text" id="code" placeholder="" name="code">
-</form>
 </body>
 </html>
 

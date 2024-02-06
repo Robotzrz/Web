@@ -75,6 +75,23 @@ def create_user(name, password):                   # функция возвра
         return 0
 
 
+def create_field(name, board):
+    items_cur.execute(f"SELECT id FROM fields WHERE name='{name}'")
+    a = items_cur.fetchall()                             
+    if len(a) == 0:
+        items_cur.execute("SELECT id FROM fields")
+        a = items_cur.fetchall()
+        num = 0
+        if a:
+            num = a[-1][0] + 1
+        f = (num, name, int((len(board) / 3) ** 0.5), board)
+        items_cur.execute(field_blank, f)
+        items.commit()
+        return 1
+    else:
+        return 0
+
+
 def create_admin(name, password):                  # функция возвращает число:  
     result = check_admin(name, password)           # 0 - имя уже есть в базе;
     if result == 0:                                # 1 - админ успешно создан
@@ -125,8 +142,7 @@ def add_field(u_id, f_id):
     people_cur.execute(f'UPDATE fields FROM users WHERE id={u_id} TO {new_fields}')
 
     
-def get_list(string1):
-    string = string1[1:]
+def get_list(string):
     result = []
     for index in range(0, len(string), 3):
         result.append(string[index : index + 3])
@@ -144,27 +160,29 @@ def get_string_all(list1, length=3):
         res += get_string_one(i, length)
     return res
 
-
 current_name = ""
 current_mode = ""
 
 
 app = Flask(__name__)
 
-@app.route("/admin")
+@app.route("/admin", methods=['GET', 'POST'])
 def admin():
-    # board = request.form.get('board')
+    # name = request.form.get("name")
+    board = str(request.form.get("code"))
     # if current_name == "" or current_mode == "":
     #     return redirect(url_for('reg'))
+    if board and len(board) > 2:
+        print(create_field("hi", board))
     return render_template("admin.html")
 
-@app.route("/user")
+@app.route("/user", methods=['GET', 'POST'])
 def user():
     if current_name == "" or current_mode == "":
         return redirect(url_for('reg'))
     return render_template("user.html")
 
-@app.route("/reg")
+@app.route("/reg", methods=['GET', 'POST'])
 def reg():
     name = request.form.get('name')
     password = request.form.get('password')
