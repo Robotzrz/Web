@@ -210,23 +210,25 @@ def reg():                                    # Регистрация
 def login():                                    # Вход
     global current_mode
     global current_name
+    alert = [0]
     name = request.form.get('name')
     password = request.form.get('password')
     mode = request.form.get("admin")
-    print(str(name), str(password), str(mode))
     if mode == "admin":
         res = check_admin(name, password)
         if res == 2:
             current_name = name
             current_mode = "admin"
             return redirect(url_for('admin'))
+        elif res == 1:
+            alert = [1]
     elif mode == "user":
         res = check_user(name, password)
         if res == 2:
             current_name = name
             current_mode = "user"
             return redirect(url_for('user'))
-    return render_template("login.html")
+    return render_template("login.html", mes=alert)
 
 if __name__ == "__main__":
   app.run(debug=True, host="0.0.0.0", port=80)
