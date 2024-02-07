@@ -103,3 +103,11 @@ select{
     gap: 10px;
     width: 550px;
 }
+.pop_up_user{
+    display: none;
+    background-color: white;
+}
+a{
+    text-decoration: none;
+    color: #000;
+}
