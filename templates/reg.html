@@ -29,5 +29,13 @@
       </form>
     </div>
   </div>
+  
+<script>
+  let message = {{mes | tojson}}
+  if (message == 0)
+  {
+    alert("Данный логин уже зарегистрирован");
+  }
+</script>
 </body>
 </html>

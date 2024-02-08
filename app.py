@@ -171,7 +171,7 @@ def admin():
     board = str(request.form.get("code"))
     if current_name == "" or current_mode == "":
         print("BACK TO LOGIN")
-        return redirect(url_for('login'))
+        return redirect(url_for('login', mes=[0]))
     if board and len(board) > 2:
         print(create_field(name, board))
     return render_template("admin.html")
@@ -180,13 +180,14 @@ def admin():
 def user():
     if current_name == "" or current_mode == "":
         print("BACK TO LOGIN")
-        return redirect(url_for('login'))
+        return redirect(url_for('login', mes=[0]))
     return render_template("user.html")
 
 @app.route("/reg", methods=['GET', 'POST'])
 def reg():                                    # Регистрация
     global current_mode
     global current_name
+    alert = [-1]
     name = request.form.get('name')
     password = request.form.get('password')
     mode = request.form.get("admin")
@@ -197,20 +198,24 @@ def reg():                                    # Регистрация
             current_name = name
             current_mode = "admin"
             return redirect(url_for('admin'))
+        else:
+            alert = [0]
     elif mode == "user":
         res = create_user(name, password)
         if res == 1:
             current_name = name
             current_mode = "user"
             return redirect(url_for('user'))
-    return render_template("reg.html")
+        else:
+            alert = [0]
+    return render_template("reg.html", mes=alert)
 
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():                                    # Вход
     global current_mode
     global current_name
-    alert = [0]
+    alert = [-1]
     name = request.form.get('name')
     password = request.form.get('password')
     mode = request.form.get("admin")
@@ -220,14 +225,17 @@ def login():                                    # Вход
             current_name = name
             current_mode = "admin"
             return redirect(url_for('admin'))
-        elif res == 1:
-            alert = [1]
+        else:
+            alert = [res]
     elif mode == "user":
         res = check_user(name, password)
         if res == 2:
             current_name = name
             current_mode = "user"
             return redirect(url_for('user'))
+        else:
+            alert = [res]
+    print("going to login with", alert)
     return render_template("login.html", mes=alert)
 
 if __name__ == "__main__":
