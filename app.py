@@ -29,50 +29,67 @@ people_cur = people.cursor()
 # field_blank = "INSERT INTO fields (id, name, size, board) VALUES (%s, %s, %s, %s)"
 
 
-# def check_user(username, password):                                           # функция возвращает число: 
-#     people_cur.execute(f"SELECT password FROM users WHERE name='{username}'") # 0 - имени нет в базе;
-#     a = people_cur.fetchall()                                                 # 1 - имя есть в базе, но пароль неверен;
-#     if len(a) == 0:                                                           # 2 - имя и пароль верны
-#         return 0
-#     elif len(a) == 1:
-#         if a[0] == password:
-#             return 2
-#         else:
-#             return 1
-#     else:
-#         print("ЕСТЬ ПОЛЬЗОВАТЕЛИ С ОДИНАКОВЫМИ ИМЕНАМИ!")
-#         raise(OverflowError)
+def check_user(username, password):                                           # функция возвращает число: 
+    people_cur.execute(f"SELECT password FROM users WHERE name='{username}'") # 0 - имени нет в базе;
+    a = people_cur.fetchall()                                                 # 1 - имя есть в базе, но пароль неверен;
+    if len(a) == 0:                                                           # 2 - имя и пароль верны
+        return 0
+    elif len(a) == 1:
+        if a[0][0] == password:
+            return 2
+        else:
+            return 1
+    else:
+        print("ЕСТЬ ПОЛЬЗОВАТЕЛИ С ОДИНАКОВЫМИ ИМЕНАМИ!")
+        raise(OverflowError)
     
     
-# def check_admin(username, password):                                           # функция возвращает число: 
-#     people_cur.execute(f"SELECT password FROM admins WHERE name='{username}'") # 0 - имени нет в базе;
-#     a = people_cur.fetchall()                                                  # 1 - имя есть в базе, но пароль неверен;
-#     if len(a) == 0:                                                            # 2 - имя и пароль верны
-#         return 0
-#     elif len(a) == 1:
-#         if a[0] == password:
-#             return 2
-#         else:
-#             return 1
-#     else:
-#         print("ЕСТЬ АДМИНЫ С ОДИНАКОВЫМИ ИМЕНАМИ!")
-#         raise(OverflowError)    
+def check_admin(username, password):                                           # функция возвращает число: 
+    people_cur.execute(f"SELECT password FROM admins WHERE name='{username}'") # 0 - имени нет в базе;
+    a = people_cur.fetchall()                                                  # 1 - имя есть в базе, но пароль неверен;
+    if len(a) == 0:                                                            # 2 - имя и пароль верны
+        return 0
+    elif len(a) == 1:
+        if a[0][0] == password:
+            return 2
+        else:
+            return 1
+    else:
+        print("ЕСТЬ АДМИНЫ С ОДИНАКОВЫМИ ИМЕНАМИ!")
+        raise(OverflowError)    
 
 
-# def create_user(name, password):                   # функция возвращает число:  
-#     result = check_user(name, password)            # 0 - имя уже есть в базе;
-#     if result == 0:                                # 1 - пользователь успешно создан
-#         people_cur.execute("SELECT id FROM users")
-#         a = people_cur.fetchall()
-#         num = 0
-#         if a:
-#             num = a[-1][0] + 1
-#         us = (num, name, password, {}, {})
-#         people_cur.execute(user_blank, us)
-#         people.commit()
-#         return 1
-#     else:
-#         return 0
+def create_user(name, password):                   # функция возвращает число:  
+    result = check_user(name, password)            # 0 - имя уже есть в базе;
+    if result == 0:                                # 1 - пользователь успешно создан
+        people_cur.execute("SELECT id FROM users")
+        a = people_cur.fetchall()
+        num = 0
+        if a:
+            num = a[-1][0] + 1
+        us = (num, name, password, "", "")
+        people_cur.execute(user_blank, us)
+        people.commit()
+        return 1
+    else:
+        return 0
+
+
+def create_field(name, board):
+    items_cur.execute(f"SELECT id FROM fields WHERE name='{name}'")
+    a = items_cur.fetchall()                             
+    if len(a) == 0:
+        items_cur.execute("SELECT id FROM fields")
+        a = items_cur.fetchall()
+        num = 0
+        if a:
+            num = a[-1][0] + 1
+        f = (num, name, int((len(board) / 3) ** 0.5), board)
+        items_cur.execute(field_blank, f)
+        items.commit()
+        return 1
+    else:
+        return 0
 
 
 # def create_admin(name, password):                  # функция возвращает число:  
@@ -125,12 +142,11 @@ def add_field(u_id, f_id):
     people_cur.execute(f'UPDATE fields FROM users WHERE id={u_id} TO {new_fields}')
 
     
-# def get_list(string1):
-#     string = string1[1:]
-#     result = []
-#     for index in range(0, len(string), 3):
-#         result.append(string[index : index + 3])
-#     return result
+def get_list(string):
+    result = []
+    for index in range(0, len(string), 3):
+        result.append(string[index : index + 3])
+    return result
     
     
 # def get_string_one(num, length):
@@ -144,48 +160,82 @@ def add_field(u_id, f_id):
 #         res += get_string_one(i, length)
 #     return res
 
-
 current_name = ""
 current_mode = ""
 
-
 app = Flask(__name__)
-
-@app.route("/admin")
+@app.route("/")
+def to_reg():
+    return redirect(url_for('reg', mes=[-1]))
+    
+@app.route("/admin", methods=['GET', 'POST'])
 def admin():
-    # board = request.form.get('board')
-    # if current_name == "" or current_mode == "":
-    #     return redirect(url_for('reg'))
+    name = request.form.get("name")
+    board = str(request.form.get("code"))
+    if current_name == "" or current_mode == "":
+        return redirect(url_for('login', mes=[0]))
+    if board and len(board) > 2:
+        create_field(name, board)
     return render_template("admin.html")
 
-@app.route("/user")
+@app.route("/user", methods=['GET', 'POST'])
 def user():
-    # if current_name == "" or current_mode == "":
-    #     return redirect(url_for('reg'))
+    if current_name == "" or current_mode == "":
+        return redirect(url_for('login', mes=[0]))
     return render_template("user.html")
 
-@app.route("/reg")
-def reg():
+@app.route("/reg", methods=['GET', 'POST'])
+def reg():                                    # Регистрация
+    global current_mode
+    global current_name
+    alert = [-1]
     name = request.form.get('name')
     password = request.form.get('password')
     mode = request.form.get("admin")
-    print(name, password, mode)
+    if mode == "admin":
+        res = create_admin(name, password)
+        if res == 1:
+            current_name = name
+            current_mode = "admin"
+            return redirect(url_for('admin'))
+        else:
+            alert = [0]
+    elif mode == "user":
+        res = create_user(name, password)
+        if res == 1:
+            current_name = name
+            current_mode = "user"
+            return redirect(url_for('user'))
+        else:
+            alert = [0]
+    return render_template("reg.html", mes=alert)
+
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():                                    # Вход
+    global current_mode
+    global current_name
+    alert = [-1]
+    name = request.form.get('name')
+    password = request.form.get('password')
+    mode = request.form.get("admin")
     if mode == "admin":
         res = check_admin(name, password)
         if res == 2:
-            current_name == name
-            current_mode == "admin"
+            current_name = name
+            current_mode = "admin"
             return redirect(url_for('admin'))
-        return render_template("reg.html")
+        else:
+            alert = [res]
     elif mode == "user":
         res = check_user(name, password)
         if res == 2:
-            current_name == name
-            current_mode == "user"
+            current_name = name
+            current_mode = "user"
             return redirect(url_for('user'))
-    return render_template("reg.html")
-
-
+        else:
+            alert = [res]
+    return render_template("login.html", mes=alert)
 
 if __name__ == "__main__":
   app.run(debug=True, host="0.0.0.0", port=80)

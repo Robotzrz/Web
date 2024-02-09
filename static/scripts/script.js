@@ -1,6 +1,11 @@
 let n = 0;
 var s = [];
 let gift_id = "1";
+if (message == 1)
+{
+    alert("Неверный пароль!");
+}
+console.log(message);
 document.getElementById("create").addEventListener("click", () => {
     document.getElementById("pop_up").style.display = "block"
 })
@@ -62,10 +67,17 @@ function toggleShip(cell) {
         st = gift_id
     }
     else{
-        st = "000";
+        st = "---";
     }
     s[currentIndex] = st;
     console.log(s);
+    let strok = "";
+    for (let i = 0; i < s.length; i++)
+    {
+        strok += s[i];
+    }
+    console.log(strok)
+    document.getElementById("code").value = strok;
 }
 
 function isAdjacentToShip(index, cells) {

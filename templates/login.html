@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Вход</title>
+    <link  type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/reg.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="window">
+      <h1>Добро пожаловать!</h1>
+      <form method="POST">
+        <label class="near">Логин</p><br>
+            <input type="login" name="name"/><br>
+    
+            <label class="near">Пароль</p><br>
+            <input type="password" name="password"/><br>
+        
+            <input type="radio" id="user" value="user" name="admin"/>
+            <label for="user">Пользователь</label><br>
+            <input type="radio" id="admin" value="admin" name="admin"/>
+            <label for="admin">Админ</label><br>
+    
+            <button id="enter" type="submit">Войти</button><br>
+            <a id="reg" href="/reg">Регистрация</a>
+      </form>
+    </div>
+  </div>
+<script>
+  let message = {{mes | tojson}}
+  if (message == 1)
+  {
+    alert("Неверный пароль");
+  }
+  if (message == 0)
+  {
+    alert("Данный логин не зарегистрирован");
+  }
+</script>
+</body>
+</html>

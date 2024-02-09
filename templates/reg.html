@@ -2,43 +2,40 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>title</title>
+    <title>Регистрация</title>
     <link  type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/reg.css') }}">
+    <script src="{{url_for('static', filename='scripts/script.js')}}" defer></script>
 </head>
 <body>
   <div class="container">
     <div class="window">
       <h1>Добро пожаловать!</h1>
+      <form method="POST">
 
-      <div class="input_">
-        <p class="near">Логин</p>
-        <input type="login"/>
-      </div>
+        <label class="near">Логин</p><br>
+        <input type="login" name="name"/><br>
 
-      <div class="input_">
-        <p class="near">Пароль</p>
-        <input type="password"/>
-      </div>
-      <form>
+        <label class="near">Пароль</p><br>
+        <input type="password" name="password"/><br>
+    
+        <input type="radio" id="user" value="user" name="admin"/>
+        <label for="user">Пользователь</label><br>
+        <input type="radio" id="admin" value="admin" name="admin"/>
+        <label for="admin">Админ</label><br>
 
-      <div class="select">
-        <div>
-          <input type="radio" id="user" value="user" name="admin"/>
-          <label for="user">Пользователь</label>
-        </div>
+        <button id="enter" type="submit">Регистрация</button><br>
+        <a id="reg" href="/login">Войти</a>
 
-        <div>
-          <input type="radio" id="admin" value="admin" name="admin"/>
-          <label for="admin">Админ</label>
-        </div>
-      </div>
       </form>
-      <div class="else">
-        <button id="enter">Войти</button>
-        <button id="reg">Регистрация</button>
-      </div>
     </div>
   </div>
-  <script src="script.js"></script>
+  
+<script>
+  let message = {{mes | tojson}}
+  if (message == 0)
+  {
+    alert("Данный логин уже зарегистрирован");
+  }
+</script>
 </body>
 </html>
