@@ -164,22 +164,23 @@ current_name = ""
 current_mode = ""
 
 app = Flask(__name__)
-
+@app.route("/")
+def to_reg():
+    return redirect(url_for('reg', mes=[-1]))
+    
 @app.route("/admin", methods=['GET', 'POST'])
 def admin():
     name = request.form.get("name")
     board = str(request.form.get("code"))
     if current_name == "" or current_mode == "":
-        print("BACK TO LOGIN")
         return redirect(url_for('login', mes=[0]))
     if board and len(board) > 2:
-        print(create_field(name, board))
+        create_field(name, board)
     return render_template("admin.html")
 
 @app.route("/user", methods=['GET', 'POST'])
 def user():
     if current_name == "" or current_mode == "":
-        print("BACK TO LOGIN")
         return redirect(url_for('login', mes=[0]))
     return render_template("user.html")
 
@@ -191,7 +192,6 @@ def reg():                                    # Регистрация
     name = request.form.get('name')
     password = request.form.get('password')
     mode = request.form.get("admin")
-    print(name, password, mode)
     if mode == "admin":
         res = create_admin(name, password)
         if res == 1:
@@ -235,7 +235,6 @@ def login():                                    # Вход
             return redirect(url_for('user'))
         else:
             alert = [res]
-    print("going to login with", alert)
     return render_template("login.html", mes=alert)
 
 if __name__ == "__main__":

@@ -60,7 +60,7 @@ function toggleShip(cell) {
         st = gift_id
     }
     else{
-        st = "000";
+        st = "---";
     }
     s[currentIndex] = st;
     console.log(s);
