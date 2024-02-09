@@ -1,15 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for
-# import mysql.connector
-# import datetime as dt
+import mysql.connector
+import datetime as dt
 
-# items = mysql.connector.connect(
-#   host="localhost",
-#   user="root",
-#   password="14916",
-#   database="items"
-# )
+items = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="14916",
+  database="items"
+)
 
-# items_cur = items.cursor()
+items_cur = items.cursor()
 
 people = mysql.connector.connect(
   host="localhost",
@@ -20,13 +20,13 @@ people = mysql.connector.connect(
 people_cur = people.cursor()
 
 
-# admin_blank = "INSERT INTO admins (id, name, password) VALUES (%s, %s, %s)"
+admin_blank = "INSERT INTO admins (id, name, password) VALUES (%s, %s, %s)"
 
-# user_blank = "INSERT INTO users (id, name, password, gifts, fields) VALUES (%s, %s, %s, %s, %s)"
+user_blank = "INSERT INTO users (id, name, password, gifts, fields) VALUES (%s, %s, %s, %s, %s)"
 
-# gift_blank = "INSERT INTO gifts (id, name, description) VALUES (%s, %s, %s)"
+gift_blank = "INSERT INTO gifts (id, name, description) VALUES (%s, %s, %s)"
 
-# field_blank = "INSERT INTO fields (id, name, size, board) VALUES (%s, %s, %s, %s)"
+field_blank = "INSERT INTO fields (id, name, size, board) VALUES (%s, %s, %s, %s)"
 
 
 def check_user(username, password):                                           # функция возвращает число: 
@@ -92,47 +92,47 @@ def create_field(name, board):
         return 0
 
 
-# def create_admin(name, password):                  # функция возвращает число:  
-#     result = check_admin(name, password)           # 0 - имя уже есть в базе;
-#     if result == 0:                                # 1 - админ успешно создан
-#         people_cur.execute("SELECT id FROM admins")
-#         a = people_cur.fetchall()
-#         num = 0
-#         if a:
-#             num = a[-1][0] + 1
-#         ad = (num, name, password)
-#         people_cur.execute(admin_blank, ad)
-#         people.commit()
-#         return 1
-#     else:
-#         return 0
+def create_admin(name, password):                  # функция возвращает число:  
+    result = check_admin(name, password)           # 0 - имя уже есть в базе;
+    if result == 0:                                # 1 - админ успешно создан
+        people_cur.execute("SELECT id FROM admins")
+        a = people_cur.fetchall()
+        num = 0
+        if a:
+            num = a[-1][0] + 1
+        ad = (num, name, password)
+        people_cur.execute(admin_blank, ad)
+        people.commit()
+        return 1
+    else:
+        return 0
         
         
-# def u_get_id(name):
-#     people_cur.execute(f'SELECT id FROM users WHERE name="{name}"')
-#     return people_cur.fetchall()[0]
+def u_get_id(name):
+    people_cur.execute(f'SELECT id FROM users WHERE name="{name}"')
+    return people_cur.fetchall()[0]
     
     
-# def a_get_id(name):
-#     people_cur.execute(f'SELECT id FROM admins WHERE name="{name}"')
-#     return people_cur.fetchall()[0]
+def a_get_id(name):
+    people_cur.execute(f'SELECT id FROM admins WHERE name="{name}"')
+    return people_cur.fetchall()[0]
     
     
-# def g_get_id(name):
-#     items_cur.execute(f'SELECT id FROM gifts WHERE name="{name}"')
-#     return items_cur.fetchall()[0]
+def g_get_id(name):
+    items_cur.execute(f'SELECT id FROM gifts WHERE name="{name}"')
+    return items_cur.fetchall()[0]
     
     
-# def f_get_id(name):
-#     items_cur.execute(f'SELECT id FROM fields WHERE name="{name}"')
-#     return items_cur.fetchall()[0]
+def f_get_id(name):
+    items_cur.execute(f'SELECT id FROM fields WHERE name="{name}"')
+    return items_cur.fetchall()[0]
     
     
-# def add_gift(u_id, g_id):
-#     people_cur.execute(f'SELECT gifts FROM users WHERE id={u_id}')
-#     old_gifts = str(people_cur.fetchall()[0])
-#     new_gifts = old_gifts + get_string_one(g_id, 3)
-#     people_cur.execute(f'UPDATE gifts FROM users WHERE id={u_id} TO {new_gifts}')
+def add_gift(u_id, g_id):
+    people_cur.execute(f'SELECT gifts FROM users WHERE id={u_id}')
+    old_gifts = str(people_cur.fetchall()[0])
+    new_gifts = old_gifts + get_string_one(g_id, 3)
+    people_cur.execute(f'UPDATE gifts FROM users WHERE id={u_id} TO {new_gifts}')
     
     
 def add_field(u_id, f_id):
@@ -149,16 +149,16 @@ def get_list(string):
     return result
     
     
-# def get_string_one(num, length):
-#     num = '0' * (length - len(str(num))) + str(num)
-#     return num
+def get_string_one(num, length):
+    num = '0' * (length - len(str(num))) + str(num)
+    return num
         
         
-# def get_string_all(list1, length=3):
-#     res = ""
-#     for i in list1:
-#         res += get_string_one(i, length)
-#     return res
+def get_string_all(list1, length=3):
+    res = ""
+    for i in list1:
+        res += get_string_one(i, length)
+    return res
 
 current_name = ""
 current_mode = ""
@@ -183,6 +183,27 @@ def user():
     if current_name == "" or current_mode == "":
         return redirect(url_for('login', mes=[0]))
     return render_template("user.html")
+
+@app.route("/prizes", methods=['GET', 'POST'])
+def prizes():
+    if current_name == "" or current_mode != "user":
+        return redirect(url_for('login', mes=[0]))
+    u_id = u_get_id(current_name)
+    pr = get_list(people_cur.execute(f"SELECT gifts FROM users WHERE id={u_id}").fetch_all())
+    name = []
+    date = []
+    descr = []
+    img = []
+    for i in pr:
+        na = items_cur.execute(f"SELECT name FROM gifts WHERE id={int(i)}").fetch_one()
+        da = items_cur.execute(f"SELECT date FROM gifts WHERE id={int(i)}").fetch_one()
+        de = items_cur.execute(f"SELECT description FROM gifts WHERE id={int(i)}").fetch_one()
+        im = items_cur.execute(f"SELECT image FROM gifts WHERE id={int(i)}").fetch_one()
+        name.append(na)
+        date.append(da)
+        descr.append(de)
+        img.append(im)
+    return render_template("prizes.html", name=name, date=date, descr=descr, img=img)
 
 @app.route("/reg", methods=['GET', 'POST'])
 def reg():                                    # Регистрация

@@ -24,4 +24,15 @@
     </div>
     <a href="{{url_for('prizes')}}">посметреть выигранные призы</a>
 </body>
+
+<script>
+    let name = {{name | tojson}};
+    let date = {{date | tojson}};
+    let descr = {{descr | tojson}};
+    let img = {{img | tojson}};
+    for (let = 1; i < name.length; i++)
+    {
+        // создание списка призов
+    }
+</script>
 </html>

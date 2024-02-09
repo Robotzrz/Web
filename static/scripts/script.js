@@ -76,7 +76,6 @@ function toggleShip(cell) {
     {
         strok += s[i];
     }
-    console.log(strok)
     document.getElementById("code").value = strok;
 }
 
@@ -99,7 +98,7 @@ function isAdjacentToShip(index, cells) {
 let add_btn = document.getElementById("add")
 
 add_btn.addEventListener("click", () => {
-    // let new_text = document.querySelector("#item").value; // соxраняем текCT
+    // let new_text = document.querySelector("#item").value; // соxраняем текст
     // document.querySelector("#item").value = ""; // oчишм пoле
     // document.querySelector("#proverka").value = "";
 
