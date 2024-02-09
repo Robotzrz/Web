@@ -5,14 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link  type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{url_for('static', filename='scripts/script_user.js')}}" defer></script>
 </head>
 <body>
     <nav></nav>
-    <div class="main">
-        <div class="fields">
-            <h2>поля</h2>
+    <div class="main_user">
+            <h2>выберите поле для игры</h2>
+        <div class="fields_user">
             <select name="" id=""></select>
+            <button id="choose">выбрать</button>
+        </div>
+        <div class="pop_up_user" id="pop_up">
+            <label for="board-width">Осталось выстрелов:</label>
+            <p>N</p>
+            <button class="" id="close">закрыть</button>
+            <div id="board-container"></div>
         </div>
     </div>
+    <a href="{{url_for('prizes')}}">посметреть выигранные призы</a>
 </body>
 </html>

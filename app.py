@@ -160,8 +160,8 @@ def admin():
 
 @app.route("/user")
 def user():
-    if current_name == "" or current_mode == "":
-        return redirect(url_for('reg'))
+    # if current_name == "" or current_mode == "":
+    #     return redirect(url_for('reg'))
     return render_template("user.html")
 
 @app.route("/reg")
