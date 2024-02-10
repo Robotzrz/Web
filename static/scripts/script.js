@@ -34,16 +34,8 @@ function toggleShip(cell) {
     const currentIndex = parseInt(cell.dataset.index);
     const cells = document.querySelectorAll(".cell");
     if (cell.classList.contains("ship")) {
-        document.getElementById("pop_up2").style.display = "grid";
-        document.getElementById("delete").addEventListener("click", () => {
-            cell.classList.remove("ship");
-            document.getElementById("pop_up2").style.display = "none"
-        })
-        document.getElementById("cancel").addEventListener("click", () => {
-            document.getElementById("pop_up2").style.display = "none"
-        })
-    } 
-    else {
+        cell.classList.remove("ship");
+    } else {
         // Проверка на близость кораблей
         if (!isAdjacentToShip(currentIndex, cells)) {
             document.getElementById("pop_up2").style.display = "grid";
@@ -145,27 +137,3 @@ add_btn.addEventListener("click", () => {
         parent.parentNode.removeChild(parent);
     });
 })
-function createBoard2(){
-    const widthInput = document.getElementById("board-width");
-
-    boardWidth = iz_bazu_dannuh
-
-    const boardContainer = document.getElementById("board-container");
-    boardContainer.style.setProperty('--board-width', boardWidth);
-    boardContainer.innerHTML = ""; // Очищаем поле перед созданием нового
-
-    for (let i = 0; i < boardWidth * boardWidth; i++) {
-        const cell = document.createElement("div");
-        cell.classList.add("cell");
-        cell.dataset.index = i;
-        boardContainer.appendChild(cell);
-
-        cell.addEventListener("click", function() {
-            toggleShip(cell);
-        });
-        let s = [999];
-        if(s[i] != '---'){
-            cell.classList.add("ship");
-        }
-    }
-}
