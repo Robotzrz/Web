@@ -71,7 +71,7 @@ button{
     background-color: #3498db;
 }
 .settings{
-    display: none;
+    display: block;
     position: absolute;
     background-color: white;
 }
