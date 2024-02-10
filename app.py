@@ -68,7 +68,7 @@ def create_user(name, password):                   # функция возвра
         if a:
             num = a[-1][0] + 1
         us = (num, name, password, "", "")
-        people_cur.execute(f"CREATE TABLE {name} (id INTEGER(10), moves INTEGER(10), size INTEGER(10), board VARCHAR(7500))")
+        people_cur.execute(f"CREATE TABLE {name} (id INTEGER(10), name VARCHAR(45), moves INTEGER(10), size INTEGER(10), board VARCHAR(7500))")
         people_cur.execute(user_blank, us)
         people.commit()
         return 1
@@ -197,7 +197,7 @@ def create_prize():
     descr = request.form.get("descr")
     image = request.form.get("img")
     dele = request.form.get("del")
-    if dele == "1":
+    if dele == "1" and image and descr and date and name:
         items_cur.execute("SELECT id FROM gifts")
         a = items_cur.fetchall()
         num = 0
@@ -275,7 +275,7 @@ def view_prize():
     return render_template("view_prize.html", n=cur_gift[0], i=cur_gift[1], de=cur_gift[2], d=cur_gift[3])
 
 @app.route("/view_board", methods=['GET', 'POST'])
-def create_board():
+def view_board():
     items_cur.execute("SELECT name FROM fields WHERE changeable=1")
     nboards_changeable = list(items_cur.fetchall())
     items_cur.execute("SELECT board FROM fields WHERE changeable=1")
@@ -292,26 +292,25 @@ def create_board():
         create_field(name, board)
     return render_template("view_board.html", nc=boards_changeable, nu=boards_unchangeable, c=boards_changeable, u=boards_unchangeable)
 
-
 @app.route("/user", methods=['GET', 'POST'])
 def user():
-    
     global cur_gift
     global cur_board
     people_cur.execute(f"SELECT name FROM {current_name}")
+    print("")
     nboards_changeable = list(items_cur.fetchall())
-    items_cur.execute("SELECT name FROM gifts")
-    gifts = list(items_cur.fetchall())
+    people_cur.execute(f"SELECT gifts FROM users WHERE name='{current_name}'")
+    gifts = get_list(people_cur.fetchall())
+    gift = []
+    for i in range(len(gifts)):
+        items_cur.execute(f"SELECT name FROM gifts WHERE id={int(gifts[i])}")
+        gift.append(items_cur.fetchone())
+    people_cur.execute(f"SELECT name FROM {current_name}")
     name = request.form.get("name")
     if current_name == "" or current_mode == "":
         return redirect(url_for('login', mes=[0]))
     if type(name) != None:
-        if str(name) == "g":
-            cur_gift = ["", "", "", ""]
-            return redirect(url_for('create_prize'))
-        elif str(name) == "b":
-            return redirect(url_for('create_board'))
-        elif str(name)[-1] == "g":
+        if str(name)[-1] == "g":
             cur_gift.append(str(name[:-1]))
             items_cur.execute(f"SELECT image FROM gifts WHERE name='{str(name[:-1])}'")
             cur_gift.append(items_cur.fetchone())
@@ -319,32 +318,11 @@ def user():
             cur_gift.append(items_cur.fetchone())
             items_cur.execute(f"SELECT date FROM gifts WHERE name='{str(name[:-1])}'")
             cur_gift.append(items_cur.fetchone())
-            return redirect(url_for('create_prize'))
+            return redirect(url_for('view_prize'))
         elif str(name)[-1] == "b":
             board = items_cur.execute(f"SELECT board FROM fields WHERE name='{name[:-1]}'")
-            return redirect(url_for('create_board'))
-    return render_template("admin.html", nc=nboards_changeable, g=gifts)
-
-@app.route("/prizes", methods=['GET', 'POST'])
-def prizes():
-    if current_name == "" or current_mode != "user":
-        return redirect(url_for('login', mes=[0]))
-    u_id = u_get_id(current_name)
-    pr = get_list(people_cur.execute(f"SELECT gifts FROM users WHERE id={u_id}").fetchall())
-    name = []
-    date = []
-    descr = []
-    img = []
-    # for i in pr:
-    #     na = items_cur.execute(f"SELECT name FROM gifts WHERE id={int(i)}").fetch_one()
-    #     da = items_cur.execute(f"SELECT date FROM gifts WHERE id={int(i)}").fetch_one()
-    #     de = items_cur.execute(f"SELECT description FROM gifts WHERE id={int(i)}").fetch_one()
-    #     im = items_cur.execute(f"SELECT image FROM gifts WHERE id={int(i)}").fetch_one()
-    #     name.append(na)
-    #     date.append(da)
-    #     descr.append(de)
-    #     img.append(im)
-    return render_template("prizes.html", name=name, date=date, descr=descr, img=img)
+            return redirect(url_for('view_board'))
+    return render_template("user.html", nc=nboards_changeable, g=gift)
 
 @app.route("/reg", methods=['GET', 'POST'])
 def reg():                                    # Регистрация
@@ -375,7 +353,6 @@ def reg():                                    # Регистрация
     elif name:
         alert = [3]
     return render_template("reg.html", mes=alert)
-
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():                                    # Вход

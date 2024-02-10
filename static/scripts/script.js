@@ -65,7 +65,6 @@ function toggleShip(cell) {
         st = "---";
     }
     s[currentIndex] = st;
-    console.log(s);
     let strok = "";
     for (let i = 0; i < s.length; i++)
     {
