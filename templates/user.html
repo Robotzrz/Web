@@ -4,25 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link  type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="{{url_for('static', filename='scripts/script_user.js')}}" defer></script>
+    <link  type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
 </head>
 <body>
-    <nav></nav>
-    <div class="main_user">
-            <h2>выберите поле для игры</h2>
-        <div class="fields_user">
-            <select name="" id=""></select>
-            <button id="choose">выбрать</button>
+    <form method="POST">
+        <div class="fields">
+            <div class="changeable" id="ch">
+                <div class="nav">
+                    <h1 align="center">Поля</h1>
+                </div>
+            </div>
+            <div id="gifts" class="gifts">
+                <div class="nav">
+                    <h1 align="center">Призы</h1>
+                </div>
+            </div>
         </div>
-        <div class="pop_up_user" id="pop_up">
-            <label for="board-width">Осталось выстрелов:</label>
-            <p>N</p>
-            <button class="" id="close">закрыть</button>
-            <div id="board-container"></div>
-        </div>
-    </div>
-    <a href="/prizes">посметреть выигранные призы</a>
-</body>
+        <input type="text" class="inp" id="inp" name="name">
+    </form>
+<script>
+let c_n = {{nc | tojson}};
+let g_n = {{g | tojson}};
+let chList = document.getElementById("ch");
+let gifts = document.getElementById("gifts");
+let inp = document.getElementById("inp");
+for (let i = 0; i < c_n.length; i++)
+{
+    const fieldDiv = document.createElement('div');
+    fieldDiv.classList.add('field');
+    const fieldName = document.createElement('button');
+    fieldName.textContent = c_n[i];
+    fieldDiv.appendChild(fieldName);
+    fieldDiv.addEventListener("click", () => {
+        inp.value = fieldName.textContent + "b";
+    });
+    chList.appendChild(fieldDiv);
+}
 
+for (let i = 0; i < g_n.length; i++)
+{
+    const giftDiv = document.createElement('div');
+    giftDiv.classList.add('gift');
+    const giftName = document.createElement('button');
+    giftName.textContent = g_n[i];
+    giftDiv.appendChild(giftName);
+    giftDiv.addEventListener("click", () => {
+        inp.value = giftName.textContent + "g";
+    });
+    gifts.appendChild(giftDiv);
+}
+
+</script>
+</body>
 </html>

@@ -1,0 +1,46 @@
+.parent {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    height: 95vh;
+    gap: 50px;
+    padding: 20px;
+}
+
+.left {
+    display: grid;
+    grid-template-rows: 1fr 1fr 3fr 3fr;
+    gap: 50px;
+}
+
+.right {
+    display: grid;
+    grid-template-rows: 1fr 10fr;
+    gap: 20px;
+}
+
+.accept {
+    background-color: green;
+    color: #fff;
+    font-size: 30px;
+}
+
+.decline {
+    background-color: red;
+    color: #fff;
+    font-size: 30px;
+}
+
+.name, .date {
+    font-size: 30px;
+    padding-left: 20px;
+}
+
+button:hover {
+    scale: 1.05;
+    transition: 0.05s;
+    cursor: pointer;
+}
+
+.inv{
+    display: none;
+}

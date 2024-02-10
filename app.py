@@ -24,7 +24,7 @@ admin_blank = "INSERT INTO admins (id, name, password) VALUES (%s, %s, %s)"
 
 user_blank = "INSERT INTO users (id, name, password, gifts, fields) VALUES (%s, %s, %s, %s, %s)"
 
-gift_blank = "INSERT INTO gifts (id, name, description, image) VALUES (%s, %s, %s, %s)"
+gift_blank = "INSERT INTO gifts (id, name, description, image, date) VALUES (%s, %s, %s, %s, %s)"
 
 field_blank = "INSERT INTO fields (id, name, size, board, changeable) VALUES (%s, %s, %s, %s, 1)"
 
@@ -163,6 +163,8 @@ def get_string_all(list1, length=3):
 
 current_name = ""
 current_mode = ""
+cur_gift = []
+cur_board = ""
 
 app = Flask(__name__)
 @app.route("/")
@@ -189,24 +191,34 @@ def create_board():
 
 @app.route("/create_prize", methods=['GET', 'POST'])
 def create_prize():
-    # items_cur.execute("SELECT name FROM fields WHERE changeable=1")
-    # nboards_changeable = list(items_cur.fetchall())
-    # items_cur.execute("SELECT board FROM fields WHERE changeable=1")
-    # boards_changeable = list(items_cur.fetchall())
-    # items_cur.execute("SELECT name FROM fields WHERE changeable=0")
-    # nboards_unchangeable = list(items_cur.fetchall())
-    # items_cur.execute("SELECT board FROM fields WHERE changeable=0")
-    # boards_unchangeable = list(items_cur.fetchall())
-    # name = request.form.get("name")
-    # board = str(request.form.get("code"))
-    # if current_name == "" or current_mode == "":
-    #     return redirect(url_for('login', mes=[0]))
-    # if board and len(board) > 2:
-    #     create_field(name, board)
-    return render_template("create_prize.html")
+    global cur_gift
+    name = request.form.get("name")
+    date = request.form.get("date")
+    descr = request.form.get("descr")
+    image = request.form.get("img")
+    dele = request.form.get("del")
+    if dele == "1":
+        items_cur.execute("SELECT id FROM gifts")
+        a = items_cur.fetchall()
+        num = 0
+        if a:
+            num = a[-1][0] + 1
+        items_cur.execute(gift_blank, (num, name, descr, image, date))
+        items.commit()
+        cur_gift = []
+        return redirect(url_for('admin'))
+    if dele == "0":
+        if cur_gift[0] != "":
+            items_cur.execute(f"DELETE FROM gifts WHERE name='{cur_gift[0]}'")
+            items.commit()
+        cur_gift = []
+        return redirect(url_for('admin'))
+    return render_template("create_prize.html", n=cur_gift[0], i=cur_gift[1], de=cur_gift[2], d=cur_gift[3])
 
 @app.route("/admin", methods=['GET', 'POST'])
 def admin():
+    global cur_gift
+    global cur_board
     items_cur.execute("SELECT name FROM fields WHERE changeable=1")
     nboards_changeable = list(items_cur.fetchall())
     items_cur.execute("SELECT name FROM fields WHERE changeable=0")
@@ -216,19 +228,102 @@ def admin():
     name = request.form.get("name")
     if current_name == "" or current_mode == "":
         return redirect(url_for('login', mes=[0]))
-    print(str(name))
     if type(name) != None:
-        if str(name)[-1] == "g":
+        if str(name) == "g":
+            cur_gift = ["", "", "", ""]
+            return redirect(url_for('create_prize'))
+        elif str(name) == "b":
+            return redirect(url_for('create_board'))
+        elif str(name)[-1] == "g":
+            cur_gift.append(str(name[:-1]))
+            items_cur.execute(f"SELECT image FROM gifts WHERE name='{str(name[:-1])}'")
+            cur_gift.append(items_cur.fetchone())
+            items_cur.execute(f"SELECT description FROM gifts WHERE name='{str(name[:-1])}'")
+            cur_gift.append(items_cur.fetchone())
+            items_cur.execute(f"SELECT date FROM gifts WHERE name='{str(name[:-1])}'")
+            cur_gift.append(items_cur.fetchone())
             return redirect(url_for('create_prize'))
         elif str(name)[-1] == "b":
+            board = items_cur.execute(f"SELECT board FROM fields WHERE name='{name[:-1]}'")
             return redirect(url_for('create_board'))
     return render_template("admin.html", nc=nboards_changeable, nu=nboards_unchangeable, g=gifts)
 
-@app.route("/user", methods=['GET', 'POST'])
-def user():
+@app.route("/view_prize", methods=['GET', 'POST'])
+def view_prize():
+    global cur_gift
+    name = request.form.get("name")
+    date = request.form.get("date")
+    descr = request.form.get("descr")
+    image = request.form.get("img")
+    dele = request.form.get("del")
+    if dele == "1":
+        items_cur.execute("SELECT id FROM gifts")
+        a = items_cur.fetchall()
+        num = 0
+        if a:
+            num = a[-1][0] + 1
+        items_cur.execute(gift_blank, (num, name, descr, image, date))
+        items.commit()
+        cur_gift = []
+        return redirect(url_for('admin'))
+    if dele == "0":
+        if cur_gift[0] != "":
+            items_cur.execute(f"DELETE FROM gifts WHERE name='{cur_gift[0]}'")
+            items.commit()
+        cur_gift = []
+        return redirect(url_for('admin'))
+    return render_template("view_prize.html", n=cur_gift[0], i=cur_gift[1], de=cur_gift[2], d=cur_gift[3])
+
+@app.route("/view_board", methods=['GET', 'POST'])
+def create_board():
+    items_cur.execute("SELECT name FROM fields WHERE changeable=1")
+    nboards_changeable = list(items_cur.fetchall())
+    items_cur.execute("SELECT board FROM fields WHERE changeable=1")
+    boards_changeable = list(items_cur.fetchall())
+    items_cur.execute("SELECT name FROM fields WHERE changeable=0")
+    nboards_unchangeable = list(items_cur.fetchall())
+    items_cur.execute("SELECT board FROM fields WHERE changeable=0")
+    boards_unchangeable = list(items_cur.fetchall())
+    name = request.form.get("name")
+    board = str(request.form.get("code"))
     if current_name == "" or current_mode == "":
         return redirect(url_for('login', mes=[0]))
-    return render_template("user.html")
+    if board and len(board) > 2:
+        create_field(name, board)
+    return render_template("view_board.html", nc=boards_changeable, nu=boards_unchangeable, c=boards_changeable, u=boards_unchangeable)
+
+
+@app.route("/user", methods=['GET', 'POST'])
+def user():
+    
+    global cur_gift
+    global cur_board
+    people_cur.execute(f"SELECT name FROM {current_name}")
+    nboards_changeable = list(items_cur.fetchall())
+    items_cur.execute("SELECT name FROM gifts")
+    gifts = list(items_cur.fetchall())
+    name = request.form.get("name")
+    if current_name == "" or current_mode == "":
+        return redirect(url_for('login', mes=[0]))
+    if type(name) != None:
+        if str(name) == "g":
+            cur_gift = ["", "", "", ""]
+            return redirect(url_for('create_prize'))
+        elif str(name) == "b":
+            return redirect(url_for('create_board'))
+        elif str(name)[-1] == "g":
+            cur_gift.append(str(name[:-1]))
+            items_cur.execute(f"SELECT image FROM gifts WHERE name='{str(name[:-1])}'")
+            cur_gift.append(items_cur.fetchone())
+            items_cur.execute(f"SELECT description FROM gifts WHERE name='{str(name[:-1])}'")
+            cur_gift.append(items_cur.fetchone())
+            items_cur.execute(f"SELECT date FROM gifts WHERE name='{str(name[:-1])}'")
+            cur_gift.append(items_cur.fetchone())
+            return redirect(url_for('create_prize'))
+        elif str(name)[-1] == "b":
+            board = items_cur.execute(f"SELECT board FROM fields WHERE name='{name[:-1]}'")
+            return redirect(url_for('create_board'))
+    return render_template("admin.html", nc=nboards_changeable, g=gifts)
 
 @app.route("/prizes", methods=['GET', 'POST'])
 def prizes():
