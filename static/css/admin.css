@@ -1,0 +1,33 @@
+.fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+}
+.unchangeable {
+    display: grid;
+    gap: 20px;
+    width: 70%;
+}
+.changeable {
+   display: grid;
+   width: 70%;
+   gap: 20px;
+}
+.gifts {
+    display: grid;
+    width: 70%;
+    gap: 20px;
+}
+.nav {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    justify-items: center;
+}
+.dinax {
+    width: 50%;
+    height: 20%;
+
+}
+.inp {
+    display: none;
+}

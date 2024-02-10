@@ -24,9 +24,9 @@ admin_blank = "INSERT INTO admins (id, name, password) VALUES (%s, %s, %s)"
 
 user_blank = "INSERT INTO users (id, name, password, gifts, fields) VALUES (%s, %s, %s, %s, %s)"
 
-gift_blank = "INSERT INTO gifts (id, name, description) VALUES (%s, %s, %s)"
+gift_blank = "INSERT INTO gifts (id, name, description, image) VALUES (%s, %s, %s, %s)"
 
-field_blank = "INSERT INTO fields (id, name, size, board) VALUES (%s, %s, %s, %s)"
+field_blank = "INSERT INTO fields (id, name, size, board, changeable) VALUES (%s, %s, %s, %s, 1)"
 
 
 def check_user(username, password):                                           # функция возвращает число: 
@@ -68,6 +68,7 @@ def create_user(name, password):                   # функция возвра
         if a:
             num = a[-1][0] + 1
         us = (num, name, password, "", "")
+        people_cur.execute(f"CREATE TABLE {name} (id INTEGER(10), moves INTEGER(10), size INTEGER(10), board VARCHAR(7500))")
         people_cur.execute(user_blank, us)
         people.commit()
         return 1
@@ -168,15 +169,60 @@ app = Flask(__name__)
 def to_reg():
     return redirect(url_for('reg', mes=[-1]))
     
-@app.route("/admin", methods=['GET', 'POST'])
-def admin():
+@app.route("/create_board", methods=['GET', 'POST'])
+def create_board():
+    items_cur.execute("SELECT name FROM fields WHERE changeable=1")
+    nboards_changeable = list(items_cur.fetchall())
+    items_cur.execute("SELECT board FROM fields WHERE changeable=1")
+    boards_changeable = list(items_cur.fetchall())
+    items_cur.execute("SELECT name FROM fields WHERE changeable=0")
+    nboards_unchangeable = list(items_cur.fetchall())
+    items_cur.execute("SELECT board FROM fields WHERE changeable=0")
+    boards_unchangeable = list(items_cur.fetchall())
     name = request.form.get("name")
     board = str(request.form.get("code"))
     if current_name == "" or current_mode == "":
         return redirect(url_for('login', mes=[0]))
     if board and len(board) > 2:
         create_field(name, board)
-    return render_template("admin.html")
+    return render_template("create_board.html", nc=boards_changeable, nu=boards_unchangeable, c=boards_changeable, u=boards_unchangeable)
+
+@app.route("/create_prize", methods=['GET', 'POST'])
+def create_prize():
+    # items_cur.execute("SELECT name FROM fields WHERE changeable=1")
+    # nboards_changeable = list(items_cur.fetchall())
+    # items_cur.execute("SELECT board FROM fields WHERE changeable=1")
+    # boards_changeable = list(items_cur.fetchall())
+    # items_cur.execute("SELECT name FROM fields WHERE changeable=0")
+    # nboards_unchangeable = list(items_cur.fetchall())
+    # items_cur.execute("SELECT board FROM fields WHERE changeable=0")
+    # boards_unchangeable = list(items_cur.fetchall())
+    # name = request.form.get("name")
+    # board = str(request.form.get("code"))
+    # if current_name == "" or current_mode == "":
+    #     return redirect(url_for('login', mes=[0]))
+    # if board and len(board) > 2:
+    #     create_field(name, board)
+    return render_template("create_prize.html")
+
+@app.route("/admin", methods=['GET', 'POST'])
+def admin():
+    items_cur.execute("SELECT name FROM fields WHERE changeable=1")
+    nboards_changeable = list(items_cur.fetchall())
+    items_cur.execute("SELECT name FROM fields WHERE changeable=0")
+    nboards_unchangeable = list(items_cur.fetchall())
+    items_cur.execute("SELECT name FROM gifts")
+    gifts = list(items_cur.fetchall())
+    name = request.form.get("name")
+    if current_name == "" or current_mode == "":
+        return redirect(url_for('login', mes=[0]))
+    print(str(name))
+    if type(name) != None:
+        if str(name)[-1] == "g":
+            return redirect(url_for('create_prize'))
+        elif str(name)[-1] == "b":
+            return redirect(url_for('create_board'))
+    return render_template("admin.html", nc=nboards_changeable, nu=nboards_unchangeable, g=gifts)
 
 @app.route("/user", methods=['GET', 'POST'])
 def user():
@@ -189,20 +235,20 @@ def prizes():
     if current_name == "" or current_mode != "user":
         return redirect(url_for('login', mes=[0]))
     u_id = u_get_id(current_name)
-    pr = get_list(people_cur.execute(f"SELECT gifts FROM users WHERE id={u_id}").fetch_all())
+    pr = get_list(people_cur.execute(f"SELECT gifts FROM users WHERE id={u_id}").fetchall())
     name = []
     date = []
     descr = []
     img = []
-    for i in pr:
-        na = items_cur.execute(f"SELECT name FROM gifts WHERE id={int(i)}").fetch_one()
-        da = items_cur.execute(f"SELECT date FROM gifts WHERE id={int(i)}").fetch_one()
-        de = items_cur.execute(f"SELECT description FROM gifts WHERE id={int(i)}").fetch_one()
-        im = items_cur.execute(f"SELECT image FROM gifts WHERE id={int(i)}").fetch_one()
-        name.append(na)
-        date.append(da)
-        descr.append(de)
-        img.append(im)
+    # for i in pr:
+    #     na = items_cur.execute(f"SELECT name FROM gifts WHERE id={int(i)}").fetch_one()
+    #     da = items_cur.execute(f"SELECT date FROM gifts WHERE id={int(i)}").fetch_one()
+    #     de = items_cur.execute(f"SELECT description FROM gifts WHERE id={int(i)}").fetch_one()
+    #     im = items_cur.execute(f"SELECT image FROM gifts WHERE id={int(i)}").fetch_one()
+    #     name.append(na)
+    #     date.append(da)
+    #     descr.append(de)
+    #     img.append(im)
     return render_template("prizes.html", name=name, date=date, descr=descr, img=img)
 
 @app.route("/reg", methods=['GET', 'POST'])
@@ -213,7 +259,9 @@ def reg():                                    # Регистрация
     name = request.form.get('name')
     password = request.form.get('password')
     mode = request.form.get("admin")
-    if mode == "admin":
+    if len(str(name)) and not(str(name)[0].isalpha()):
+        alert = [4]
+    elif mode == "admin":
         res = create_admin(name, password)
         if res == 1:
             current_name = name
@@ -229,6 +277,8 @@ def reg():                                    # Регистрация
             return redirect(url_for('user'))
         else:
             alert = [0]
+    elif name:
+        alert = [3]
     return render_template("reg.html", mes=alert)
 
 
@@ -256,6 +306,8 @@ def login():                                    # Вход
             return redirect(url_for('user'))
         else:
             alert = [res]
+    elif len(str(name)):
+        alert = [3]
     return render_template("login.html", mes=alert)
 
 if __name__ == "__main__":

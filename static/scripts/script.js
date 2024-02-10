@@ -1,11 +1,6 @@
 let n = 0;
 var s = [];
 let gift_id = "1";
-if (message == 1)
-{
-    alert("Неверный пароль!");
-}
-console.log(message);
 document.getElementById("create").addEventListener("click", () => {
     document.getElementById("pop_up").style.display = "block"
 })

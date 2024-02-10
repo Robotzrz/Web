@@ -6,7 +6,6 @@ document.getElementById("close").addEventListener("click", () => {
 })
 
 
-
 let n = 0;
 var s = "";
 let gift_id = "1";
